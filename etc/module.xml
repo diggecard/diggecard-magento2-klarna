@@ -7,5 +7,7 @@
     <module name="Diggecard_KlarnaIntegration" setup_version="0.0.1"/>
     <sequence>
         <module name="Klarna_Base"/>
+        <module name="Klarna_Kco"/>
+        <module name="Klarna_Core"/>
     </sequence>
 </config>

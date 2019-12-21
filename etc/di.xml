@@ -1,16 +1,9 @@
 <?xml version="1.0"?>
-<!--
-/**
- * This file is part of the Klarna Base module
- *
- * (c) Klarna Bank AB (publ)
- *
- * For the full copyright and license information, please view the NOTICE
- * and LICENSE files that were distributed with this source code.
- */
--->
+<!--        /**-->
+<!--        * @author DiggEcard Team-->
+<!--        * @copyright Copyright (c) 2019 DiggEcard (https://diggecard.com)-->
+<!--        */-->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
-    <preference for="Klarna\Base\Model\Api\Parameter" type="Diggecard\KlarnaIntegration\Model\Api\Parameter" />
     <type name="Klarna\Base\Model\Checkout\Orderline\OrderLineFactory">
         <arguments>
             <argument name="instances" xsi:type="array">

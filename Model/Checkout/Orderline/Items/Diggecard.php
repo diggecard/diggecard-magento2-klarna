@@ -1,11 +1,7 @@
 <?php
 /**
- * This file is part of the Klarna Base module
- *
- * (c) Klarna Bank AB (publ)
- *
- * For the full copyright and license information, please view the NOTICE
- * and LICENSE files that were distributed with this source code.
+ * @author DiggEcard Team
+ * @copyright Copyright (c) 2019 DiggEcard (https://diggecard.com)
  */
 
 namespace Diggecard\KlarnaIntegration\Model\Checkout\Orderline\Items;
@@ -30,7 +26,7 @@ class Diggecard implements OrderLineInterface
     /**
      * Checkout item type
      */
-    const ITEM_TYPE_GIFTCARD = 'gift_card';
+    const GIFT_CARD_ACCOUNT = 'giftcardaccount';
 
     /** @var DataConverter $helper */
     private $helper;
@@ -100,19 +96,31 @@ class Diggecard implements OrderLineInterface
     private function collect(Parameter $parameter, DataHolder $dataHolder)
     {
         $totals = $dataHolder->getTotals();
-
         if (!is_array($totals) || !isset($totals[self::SEGMENT_CODE])) {
             return $this;
         }
         $total = $totals[self::SEGMENT_CODE];
         $value = $total->getValue();
-        /** @var \Diggecard\KlarnaIntegration\Model\Api\Parameter $parameter */
-        $parameter->setDiggecardGiftCardUnitPrice($value)
-            ->setDiggecardGiftCardTaxRate(0)
-            ->setDiggecardGiftCardTotalAmount($value)
-            ->setDiggecardGiftCardTaxAmount(0)
-            ->setDiggecardGiftCardTitle($total->getTitle())
-            ->setDiggecardGiftCardReference($total->getCode());
+
+        $value = $this->helper->toApiFloat($value);
+        $giftCardTitle = $total->getTitle();
+
+        // Sum gift cards, if 'Magento_GiftCardAccount' used
+        if (isset($totals[self::GIFT_CARD_ACCOUNT])) {
+            $giftCardTotal = $totals[self::GIFT_CARD_ACCOUNT];
+            $giftCardValue = $giftCardTotal->getValue();
+            $giftCardValue = $this->helper->toApiFloat($giftCardValue);
+
+            $value = $giftCardValue + $value;
+            $giftCardTitle = __('Gift Cards');
+        }
+
+        $parameter->setGiftCardAccountUnitPrice($value)
+            ->setGiftCardAccountTaxRate(0)
+            ->setGiftCardAccountTotalAmount($value)
+            ->setGiftCardAccountTaxAmount(0)
+            ->setGiftCardAccountTitle($giftCardTitle)
+            ->setGiftCardAccountReference($total->getCode());
 
         return $this;
     }
@@ -122,20 +130,6 @@ class Diggecard implements OrderLineInterface
      */
     public function fetch(Parameter $checkout)
     {
-        /** @var \Diggecard\KlarnaIntegration\Model\Api\Parameter $checkout */
-        if ($checkout->getGiftcardaccountTotalAmount()) {
-            $checkout->addOrderLine([
-                'type'             => self::ITEM_TYPE_GIFTCARD,
-                'reference'        => $checkout->getDiggecardGiftCardReference(),
-                'name'             => $checkout->getDiggecardGiftCardTitle(),
-                'quantity'         => 1,
-                'unit_price'       => $checkout->getDiggecardGiftCardUnitPrice(),
-                'tax_rate'         => $checkout->getDiggecardGiftCardTaxRate(),
-                'total_amount'     => $checkout->getDiggecardGiftCardTotalAmount(),
-                'total_tax_amount' => $checkout->getDiggecardGiftCardTaxAmount(),
-            ]);
-        }
-
         return $this;
     }
 }

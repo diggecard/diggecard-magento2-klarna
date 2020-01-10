@@ -11,7 +11,7 @@
     "php": ">=7.0",
     "magento/framework": ">=100.0.4",
     "digg-ecard/diggecard": "^1.0",
-    "klarna/m2-checkout": "^8.0"
+    "klarna/m2-checkout": ">=7.2"
   },
   "minimum-stability" : "stable",
   "autoload": {
